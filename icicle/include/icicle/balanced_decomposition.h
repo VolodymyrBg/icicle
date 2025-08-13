@@ -1,6 +1,7 @@
 #pragma once
 
 #include "icicle/vec_ops.h" // For VecOpsConfig
+#include <cmath>
 
 namespace icicle {
   namespace balanced_decomposition {
@@ -36,10 +37,11 @@ namespace icicle {
       static_assert(T::TLC == 2, "Balanced decomposition assumes q ~64-bit");
 
       constexpr auto q_storage = T::get_modulus();
-      const int64_t q = *(const int64_t*)&q_storage;
-      ICICLE_ASSERT(q > 0) << "Expecting at least one slack bit to use int64 arithmetic";
+      const uint64_t q_u = (static_cast<uint64_t>(q_storage.limbs[0])) |
+                           (static_cast<uint64_t>(q_storage.limbs[1]) << 32);
+      ICICLE_ASSERT(q_u > 0) << "Expecting at least one slack bit to use 64-bit arithmetic";
 
-      const double log2_q = std::log2(static_cast<double>(q));
+      const double log2_q = std::log2(static_cast<double>(q_u));
       const double log2_b = std::log2(static_cast<double>(base));
       const uint32_t digits = static_cast<uint32_t>(std::ceil(log2_q / log2_b));
 
