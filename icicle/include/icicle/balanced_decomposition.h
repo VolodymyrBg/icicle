@@ -35,11 +35,12 @@ namespace icicle {
     static constexpr inline uint32_t compute_nof_digits(uint32_t base)
     {
       static_assert(T::TLC == 2, "Balanced decomposition assumes q ~64-bit");
-      static_assert(sizeof(((::storage<T::TLC>*)nullptr)->limbs[0]) == 4, "Balanced decomposition assumes 32-bit limbs");
+      static_assert(
+        sizeof(((::storage<T::TLC>*)nullptr)->limbs[0]) == 4, "Balanced decomposition assumes 32-bit limbs");
 
       constexpr auto q_storage = T::get_modulus();
-      const uint64_t q_u = (static_cast<uint64_t>(q_storage.limbs[0])) |
-                           (static_cast<uint64_t>(q_storage.limbs[1]) << 32);
+      const uint64_t q_u =
+        (static_cast<uint64_t>(q_storage.limbs[0])) | (static_cast<uint64_t>(q_storage.limbs[1]) << 32);
       ICICLE_ASSERT(q_u < (1ull << 63)) << "Expecting at least one slack bit (q < 2^63) for int64 arithmetic";
 
       const double log2_q = std::log2(static_cast<double>(q_u));
